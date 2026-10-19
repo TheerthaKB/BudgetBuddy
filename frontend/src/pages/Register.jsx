@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import API from "../api";
 
@@ -8,9 +9,11 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setMessage("Creating account...");
 
     try {
       const response = await fetch(`${API}/auth/register`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -25,9 +28,14 @@ function Register() {
       if (response.ok) {
         setMessage("Account created successfully! 🎉");
       } else {
-        setMessage(data.detail || "Registration failed.");
+        setMessage(
+          typeof data.detail === "string"
+            ? data.detail
+            : "Registration failed. Please check your details."
+        );
       }
     } catch (error) {
+      console.error("Registration error:", error);
       setMessage("Could not connect to the backend.");
     }
   };
@@ -36,7 +44,9 @@ function Register() {
     <div className="auth-container">
       <div className="auth-card">
         <h1>💰 BudgetBuddy</h1>
-        <p className="subtitle">Start managing your money smarter.</p>
+        <p className="subtitle">
+          Start managing your money smarter.
+        </p>
 
         <h2>Create Account</h2>
 
@@ -63,8 +73,7 @@ function Register() {
         {message && <p>{message}</p>}
 
         <p>
-          Already have an account?{" "}
-          <a href="/">Login</a>
+          Already have an account? <a href="/">Login</a>
         </p>
       </div>
     </div>
