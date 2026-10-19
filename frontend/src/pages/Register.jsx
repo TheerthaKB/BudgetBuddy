@@ -8,6 +8,7 @@ function Register() {
   const [message, setMessage] = useState("");
 
   const handleRegister = async (e) => {
+    console.log("API URL:", API);
     e.preventDefault();
     setMessage("Creating account...");
 
