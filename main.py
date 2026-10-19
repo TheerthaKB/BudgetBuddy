@@ -1,3 +1,6 @@
+
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,16 +30,29 @@ from routes.dashboard_routes import router as dashboard_router
 app = FastAPI(title="BudgetBuddy API")
 
 
-# Allow React frontend to communicate with FastAPI
+# CORS configuration
+FRONTEND_URL = "https://budget-buddy-sepia-eta.vercel.app"
+
+allowed_origins = [
+    "http://localhost:5173",
+    FRONTEND_URL,
+]
+
+# Also allow the configured frontend URL from Render, if provided.
+render_frontend_url = os.getenv("FRONTEND_URL", "").rstrip("/")
+if render_frontend_url and render_frontend_url not in allowed_origins:
+    allowed_origins.append(render_frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# Register API routes
 app.include_router(user_router)
 app.include_router(profile_router)
 app.include_router(income_router)
@@ -49,9 +65,10 @@ app.include_router(report_router)
 app.include_router(auth_router)
 
 
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to BudgetBuddy!"}
+    return {"message": "Welcome to BudgetBuddy API!"}
