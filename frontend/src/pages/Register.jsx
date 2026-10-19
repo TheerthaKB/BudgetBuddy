@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API from "../api";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -9,8 +10,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/register", {
-        method: "POST",
+      const response = await fetch(`${API}/auth/register`, {
         headers: {
           "Content-Type": "application/json",
         },

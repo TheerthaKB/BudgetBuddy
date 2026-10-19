@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import API from "../api";
 function Income() {
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ function Income() {
   const token = localStorage.getItem("token");
 
   const loadIncome = () => {
-    fetch("http://127.0.0.1:8000/income/", {
+    fetch(`${API}/income/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,8 +30,8 @@ function Income() {
     e.preventDefault();
 
     const url = editingId
-      ? `http://127.0.0.1:8000/income/${editingId}`
-      : "http://127.0.0.1:8000/income/";
+      ? `${API}/income/${editingId}`
+      : `${API}/income/`;
 
     fetch(url, {
       method: editingId ? "PUT" : "POST",
@@ -71,7 +71,7 @@ function Income() {
       return;
     }
 
-    fetch(`http://127.0.0.1:8000/income/${id}`, {
+    fetch(`${API}/income/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -92,22 +92,70 @@ function Income() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>💰 Income</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f4f7f5",
+        padding: "30px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "650px",
+          margin: "auto",
+          background: "white",
+          padding: "30px",
+          borderRadius: "18px",
+          boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
+        }}
+      >
 
+        {/* HEADER */}
+        <h1
+          style={{
+            textAlign: "center",
+            color: "#238b57",
+            marginTop: 0,
+            marginBottom: "25px",
+          }}
+        >
+          💰 Income
+        </h1>
+
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
+
           <input
             type="number"
             placeholder="Amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "14px",
+              marginBottom: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              fontSize: "16px",
+            }}
           />
 
           <select
             value={source}
             onChange={(e) => setSource(e.target.value)}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "14px",
+              marginBottom: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              fontSize: "16px",
+              background: "white",
+            }}
           >
             <option>Pocket Money</option>
             <option>Scholarship</option>
@@ -119,40 +167,183 @@ function Income() {
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "14px",
+              marginBottom: "15px",
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              fontSize: "16px",
+            }}
           />
 
-          <button type="submit">
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "13px",
+              border: "none",
+              borderRadius: "10px",
+              background: "#238b57",
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
             {editingId ? "Update Income" : "Add Income"}
           </button>
 
           {editingId && (
-            <button type="button" onClick={cancelEdit}>
+            <button
+              type="button"
+              onClick={cancelEdit}
+              style={{
+                width: "100%",
+                padding: "11px",
+                marginTop: "8px",
+                border: "1px solid #aaa",
+                borderRadius: "10px",
+                background: "white",
+                cursor: "pointer",
+              }}
+            >
               Cancel
             </button>
           )}
         </form>
 
-        <h2>Income History</h2>
+        {/* HISTORY */}
+        <h2
+          style={{
+            textAlign: "center",
+            marginTop: "30px",
+            marginBottom: "15px",
+          }}
+        >
+          Income History
+        </h2>
 
-        {income.map((item) => (
-          <div key={item.income_id}>
-            <p>
-              ₹{item.amount} - {item.source}
+        <div
+          style={{
+            maxHeight: "280px",
+            overflowY: "auto",
+            paddingRight: "5px",
+          }}
+        >
+          {income.length === 0 ? (
+            <p
+              style={{
+                textAlign: "center",
+                color: "#777",
+              }}
+            >
+              No income added yet.
             </p>
+          ) : (
+            income.map((item) => (
+              <div
+                key={item.income_id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "14px",
+                  marginBottom: "10px",
+                  borderRadius: "10px",
+                  background: "#f5faf7",
+                  border: "1px solid #dceee3",
+                }}
+              >
+                {/* INCOME DETAILS */}
+                <div>
+                  <strong
+                    style={{
+                      fontSize: "17px",
+                      color: "#238b57",
+                    }}
+                  >
+                    ₹{item.amount}
+                  </strong>
 
-            <button onClick={() => editIncome(item)}>
-              Edit
-            </button>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      color: "#555",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {item.source}
+                  </div>
 
-            <button onClick={() => deleteIncome(item.income_id)}>
-              Delete
-            </button>
-          </div>
-        ))}
+                  {item.description && (
+                    <div
+                      style={{
+                        marginTop: "3px",
+                        color: "#888",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {item.description}
+                    </div>
+                  )}
+                </div>
 
-        <button onClick={() => navigate("/dashboard")}>
-          Back to Dashboard
+                {/* ACTIONS */}
+                <div>
+                  <button
+                    onClick={() => editIncome(item)}
+                    style={{
+                      padding: "8px 12px",
+                      marginRight: "6px",
+                      border: "none",
+                      borderRadius: "7px",
+                      background: "#238b57",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => deleteIncome(item.income_id)}
+                    style={{
+                      padding: "8px 12px",
+                      border: "none",
+                      borderRadius: "7px",
+                      background: "#dc3545",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* BACK */}
+        <button
+          onClick={() => navigate("/dashboard")}
+          style={{
+            display: "block",
+            margin: "22px auto 0",
+            padding: "11px 20px",
+            border: "none",
+            borderRadius: "9px",
+            background: "#238b57",
+            color: "white",
+            fontSize: "15px",
+            cursor: "pointer",
+          }}
+        >
+          ← Back to Dashboard
         </button>
+
       </div>
     </div>
   );
